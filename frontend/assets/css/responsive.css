@@ -1,0 +1,77 @@
+/* Tablet */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .court-tabs {
+    justify-content: center;
+  }
+  
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+  }
+  
+  th, td {
+    padding: 8px;
+    font-size: 12px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .app-container {
+    padding: 10px;
+  }
+  
+  .card {
+    padding: 15px;
+  }
+  
+  .schedule-grid {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 6px;
+  }
+  
+  .time-card {
+    padding: 6px;
+  }
+  
+  .time-card .time-val {
+    font-size: 12px;
+  }
+  
+  .nav-tabs {
+    border-radius: 30px;
+  }
+  
+  .nav-tab {
+    padding: 10px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  table {
+    font-size: 12px;
+  }
+  
+  th, td {
+    padding: 6px;
+  }
+}
+
+/* Landscape mode */
+@media (max-width: 900px) and (orientation: landscape) {
+  .modal-content {
+    max-height: 90vh;
+  }
+  
+  .schedule-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+}

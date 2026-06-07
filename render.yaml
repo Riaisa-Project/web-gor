@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: booking-gor
+    runtime: node
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DB_URL
+        fromDatabase:
+          name: booking-gor-db
+          property: connectionString
+
+databases:
+  - name: booking-gor-db
+    databaseName: booking_gor
+    user: postgres
+    plan: free
