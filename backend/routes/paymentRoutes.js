@@ -3,9 +3,14 @@ const router = express.Router();
 const paymentController = require('../controllers/paymentController');
 const { authMiddleware } = require('../middleware/authMiddleware');
 
-router.post('/generate-qris', authMiddleware, paymentController.generateQRIS);
-router.get('/check-status/:transactionId', authMiddleware, paymentController.checkPaymentStatus);
-router.post('/upload-proof', authMiddleware, paymentController.uploadPaymentProof);
+// QRIS routes
+router.post('/qris/generate', authMiddleware, paymentController.generateQRIS);
+
+// Manual transfer routes
 router.get('/bank-accounts', paymentController.getBankAccounts);
+router.post('/upload-proof', authMiddleware, paymentController.uploadPaymentProof);
+
+// Status check
+router.get('/check-status/:transactionId', authMiddleware, paymentController.checkPaymentStatus);
 
 module.exports = router;

@@ -15,6 +15,7 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const courtRoutes = require('./routes/courtRoutes');
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/courts', courtRoutes);
 
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, '../frontend')));
