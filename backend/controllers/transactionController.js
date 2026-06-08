@@ -3,8 +3,11 @@ const { AppError } = require('../middleware/errorMiddleware');
 
 const getTransactions = async (req, res, next) => {
   try {
-    const query = `
-      SELECT t.id, t.total_price as "totalVal", t.status, t.payment_method,
+    const isAdmin = req.userRole === 'admin';
+    const userId = req.userId;
+
+    let query = `
+      SELECT t.id, t.total_price as "totalVal", t.status, t.payment_method, t.payment_proof,
              b.booking_date as "dateStr", b.start_time as "startVal", 
              b.end_time as "endVal", b.type,
              c.id as court, u.name as "userName", u.phone
@@ -12,9 +15,17 @@ const getTransactions = async (req, res, next) => {
       JOIN bookings b ON t.booking_id = b.id
       JOIN courts c ON b.court_id = c.id
       JOIN users u ON b.user_id = u.id
-      ORDER BY t.created_at DESC
     `;
-    const { rows } = await db.query(query);
+    const queryParams = [];
+
+    if (!isAdmin) {
+      query += ` WHERE b.user_id = $1`;
+      queryParams.push(userId);
+    }
+
+    query += ` ORDER BY t.created_at DESC`;
+
+    const { rows } = await db.query(query, queryParams);
     res.json({
       success: true,
       data: rows

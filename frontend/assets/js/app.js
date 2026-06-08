@@ -284,7 +284,7 @@ function showBookingModal(courtId, startTime) {
             </select>
             <div style="margin: 10px 0;">
                 <label>
-                    <input type="checkbox" id="isMember"> Member (Diskon Rp 10.000)
+                    <input type="checkbox" id="isMember"> Member (Diskon 5%)
                 </label>
             </div>
             <div class="price-preview" style="background: #f3f4f6; padding: 10px; border-radius: 10px; margin: 10px 0;">
@@ -306,7 +306,7 @@ function showBookingModal(courtId, startTime) {
     function updatePrice() {
         let duration = parseInt(durationSelect.value);
         let total = duration * 50000;
-        if (memberCheckbox.checked) total -= 10000;
+        if (memberCheckbox.checked) total -= (total * 0.05);
         previewTotal.textContent = total.toLocaleString('id-ID');
     }
     

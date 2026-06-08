@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOR Futsal Arena - Booking System</title>
+    <title>GOR Badminton Arena - Booking System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
             margin: 0;
@@ -248,7 +249,7 @@
     <div class="app-container">
         <div class="header">
             <div class="logo">
-                <h1><i class="fas fa-futbol"></i> GOR Futsal Arena</h1>
+                <h1><i class="fas fa-medal"></i> GOR Badminton Arena</h1>
             </div>
             <div id="userInfo">
                 <button class="btn" id="loginBtn">Login</button>
@@ -337,7 +338,7 @@
                 renderUserInfo();
                 return true;
             } catch (error) {
-                alert(error.message);
+                Swal.fire('Login Gagal', error.message, 'error');
                 return false;
             } finally {
                 hideLoading();
@@ -429,10 +430,10 @@
                     method: 'POST',
                     body: JSON.stringify({ name, email, phone, password })
                 });
-                alert('Registrasi berhasil! Silakan login.');
+                Swal.fire('Berhasil', 'Registrasi berhasil! Silakan login.', 'success');
                 showLoginModal();
             } catch (error) {
-                alert(error.message);
+                Swal.fire('Registrasi Gagal', error.message, 'error');
             } finally {
                 hideLoading();
             }
@@ -494,7 +495,7 @@
 
         function showBookingModal(courtId, startTime) {
             if (!currentUser) {
-                alert('Silakan login terlebih dahulu');
+                Swal.fire('Perhatian', 'Silakan login terlebih dahulu', 'warning');
                 showLoginModal();
                 return;
             }
@@ -516,7 +517,7 @@
                     </select>
                     <div style="margin: 10px 0;">
                         <label>
-                            <input type="checkbox" id="isMember"> Member (Diskon Rp 10.000)
+                            <input type="checkbox" id="isMember"> Member (Diskon 5%)
                         </label>
                     </div>
                     <button class="btn btn-primary" onclick="confirmBooking(${courtId}, '${startTime}')">Konfirmasi Booking</button>
@@ -551,12 +552,12 @@
                     })
                 });
                 
-                alert(`Booking berhasil! Total: Rp ${result.data.price.total.toLocaleString('id-ID')}`);
+                Swal.fire('Booking Berhasil!', `Total: Rp ${result.data.price.total.toLocaleString('id-ID')}`, 'success');
                 document.querySelector('.modal').remove();
                 await loadSchedule();
                 await loadTransactions();
             } catch (error) {
-                alert(error.message);
+                Swal.fire('Booking Gagal', error.message, 'error');
             } finally {
                 hideLoading();
             }
@@ -573,22 +574,29 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    ${currentUser?.isAdmin ? '<th>User</th>' : ''}
                                     <th>Lapangan</th>
                                     <th>Tanggal</th>
                                     <th>Jam</th>
                                     <th>Total</th>
                                     <th>Status</th>
+                                    ${currentUser?.isAdmin ? '<th>Aksi</th>' : ''}
                                 </tr>
                             </thead>
                             <tbody>
                                 ${result.data.map(trx => `
                                     <tr>
                                         <td>${trx.id.substring(0, 8)}</td>
+                                        ${currentUser?.isAdmin ? `<td>${trx.userName}<br/><small>${trx.phone}</small></td>` : ''}
                                         <td>Lapangan ${trx.court}</td>
                                         <td>${trx.dateStr}</td>
                                         <td>${trx.startVal} - ${trx.endVal}</td>
                                         <td>Rp ${parseInt(trx.totalVal).toLocaleString('id-ID')}</td>
                                         <td><span class="${trx.status === 'Lunas' ? 'badge-success' : 'badge-warning'}">${trx.status}</span></td>
+                                        ${currentUser?.isAdmin ? `<td>
+                                            ${trx.status === 'Pending' ? `<button class="btn btn-primary" style="padding: 4px 8px; font-size: 12px; margin-bottom: 4px;" onclick="approveTransaction('${trx.id}')">Approve</button>` : ''}
+                                            ${trx.payment_proof ? `<button class="btn" style="padding: 4px 8px; font-size: 12px; background: #6b7280; color: white;" onclick="viewProof('${trx.payment_proof}')">Bukti</button>` : ''}
+                                        </td>` : ''}
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -624,6 +632,36 @@
             } catch (error) {
                 console.error(error);
             }
+        }
+
+        async function approveTransaction(id) {
+            try {
+                showLoading();
+                await apiRequest(`/transactions/${id}/status`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status: 'Lunas' })
+                });
+                Swal.fire('Berhasil', 'Transaksi telah disetujui', 'success');
+                await loadTransactions();
+            } catch (error) {
+                Swal.fire('Gagal', error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function viewProof(proofUrl) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content" style="text-align: center;">
+                    <h3>Bukti Pembayaran</h3>
+                    <img src="${proofUrl}" style="max-width: 100%; margin: 15px 0; border-radius: 10px;" />
+                    <br/>
+                    <button class="btn" onclick="this.closest('.modal').remove()">Tutup</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
 
         // Navigation
@@ -673,6 +711,8 @@
         window.handleLogin = handleLogin;
         window.handleRegister = handleRegister;
         window.confirmBooking = confirmBooking;
+        window.approveTransaction = approveTransaction;
+        window.viewProof = viewProof;
     </script>
 </body>
 </html>

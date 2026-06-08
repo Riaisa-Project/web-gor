@@ -103,7 +103,7 @@ const createBooking = async (req, res, next) => {
     
     // Calculate price
     const subtotal = duration * court.price_per_hour;
-    const discount = isMember ? 10000 : 0;
+    const discount = isMember ? subtotal * 0.05 : 0;
     const total = subtotal - discount;
     
     // Create booking

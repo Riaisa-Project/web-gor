@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     buildCommand: cd backend && npm install
-    startCommand: cd backend && node server.js  # <-- WAJIB ditambahkan agar server bisa nyala
+    startCommand: cd backend && node migrate.js && node server.js
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -12,6 +12,10 @@ services:
           property: connectionString
       - key: NODE_ENV
         value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: QRIS_MERCHANT_ID
+        value: GOR123456
 
 databases:
   - name: booking-gor-db
